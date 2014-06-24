@@ -10,6 +10,8 @@ License
 ======
 BSD (see License file)
 
+You can also get GPL/LGPL version of the code from the original website location given below.
+
 Author
 ======
 Naoki Yoshinaga at Kitsuregawa, Toyoda Lab., IIS, University of Tokyo
