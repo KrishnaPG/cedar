@@ -10,7 +10,7 @@ License
 ======
 BSD (see License file)
 
-You can also get GPL/LGPL Licensed code from the original website location given below.
+Additionally the original code is also vailable under GPL/LGPL terms at the website location given below.
 
 Author
 ======
