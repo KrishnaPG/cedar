@@ -432,7 +432,33 @@ namespace cedar {
       _quota0 = 1;
     }
 #endif
-    void set_array (void* p, size_t size_ = 0) { // ad-hoc
+	// remove all the keys while keeping the memoryallocation
+	void reset()
+	{
+		// initialize existing arrays while keeping the size
+		_realloc_array(_array, _capacity, 256);
+		_realloc_array(_tail, _quota);
+		_realloc_array(_tail0, _quota0);
+		_realloc_array(_ninfo, _capacity);
+		_realloc_array(_block, _capacity >> 8);
+
+		// initialize first block
+		_array[0] = node(0, -1);
+		_array[1] = node(-255, -2);
+		for (int i = 2; i < 255; ++i)
+			_array[i] = node(-(i - 1), -(i + 1));
+		_array[255] = node(-254, -1);
+
+		_size = 256;
+		_block[0].ehead = 1; // bug fix for erase
+		*_length = static_cast <int> (sizeof (int));
+		_bheadF = _bheadC = _bheadO = 0;
+		for (size_t i = 0; i <= NUM_TRACKING_NODES; ++i)
+			tracking_node[i] = 0;
+		for (short i = 0; i <= 256; ++i)
+			_reject[i] = i + 1;
+	}
+	void set_array (void* p, size_t size_ = 0) { // ad-hoc
       clear (false);
       if (size_)
         size_ = size_ * unit_size () - static_cast <size_t> (*static_cast <int*> (p));
@@ -826,32 +852,6 @@ namespace cedar {
         if (c) _test (static_cast <npos_t> (base ^ c));
       } while ((c = _ninfo[base ^ c].sibling));
     }
-	// remove all the keys while keeping the memoryallocation
-	void reset() 
-	{ 
-		// initialize existing arrays while keeping the size
-		_realloc_array(_array, _capacity, 256);
-		_realloc_array(_tail, _quota);
-		_realloc_array(_tail0, _quota0);
-		_realloc_array(_ninfo, _capacity);
-		_realloc_array(_block, _capacity >> 8);
-
-		// initialize first block
-		_array[0] = node(0, -1);
-		_array[1] = node(-255, -2);
-		for (int i = 2; i < 255; ++i) 
-			_array[i] = node(-(i - 1), -(i + 1));
-		_array[255] = node(-254, -1);
-
-		_size = 256;
-		_block[0].ehead = 1; // bug fix for erase
-		*_length = static_cast <int> (sizeof (int));
-		_bheadF = _bheadC = _bheadO = 0;
-		for (size_t i = 0; i <= NUM_TRACKING_NODES; ++i) 
-			tracking_node[i] = 0;
-		for (short i = 0; i <= 256; ++i) 
-			_reject[i] = i + 1;
-	}
   };
 }
 #endif
