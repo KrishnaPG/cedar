@@ -6,6 +6,14 @@ If you make use of cedar for research or commercial purposes, the reference will
 
   N. Yoshinaga and M. Kitsuregawa. A Self-adaptive Classifier for Efficient Text-stream Processing. Proc. COLING 2014, 2014.
 
+
+Modifications
+======
+I have done below modifications to the code
+  1. Efficient reset method to reset the trie without reallocating the memory
+  2. Additional CommonPrefixSearch() based on sentinel (without the need for computing the string length)
+
+
 License
 ======
 BSD (see License file)

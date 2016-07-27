@@ -1,6 +1,11 @@
 // cedar -- C++ implementation of Efficiently-updatable Double ARray trie
 //  $Id: cedarpp.h 1830 2014-06-16 06:17:42Z ynaga $
 // Copyright (c) 2009-2014 Naoki Yoshinaga <ynaga@tkl.iis.u-tokyo.ac.jp>
+//
+// Modifications to the code by Gopalakrishna Palem <KrishnaPG@Yahoo.com>
+//   1. Efficient reset method to reset the trie without reallocating the memory
+//	 2. Additional CommonPrefixSearch() based on sentinel(without the need for computing the string length)
+//
 #ifndef CEDAR_H
 #define CEDAR_H
 
@@ -118,6 +123,21 @@ namespace cedar {
       _set_result (&result, b.x, len, from);
       return result;
     }
+    template <typename T, typename TSentinel>
+    size_t commonPrefixSearch (const char* key, T* result, size_t result_len, TSentinel sentinel) const
+    { 
+		npos_t from = 0;
+		size_t num = 0;
+		for (size_t pos = 0; key[pos] != sentinel; ) { // break when key[pos] == '\0'
+			union { int i; value_type x; } b;
+			b.i = _find(key, from, pos, pos + 1);
+			if (b.i == CEDAR_NO_VALUE) continue;
+			if (b.i == CEDAR_NO_PATH)  return num;
+			if (num < result_len) _set_result(&result[num], b.x, pos, from);
+			++num;
+		}
+		return num;
+	}
     template <typename T>
     size_t commonPrefixSearch (const char* key, T* result, size_t result_len) const
     { return commonPrefixSearch (key, result, result_len, std::strlen (key)); }
@@ -458,7 +478,7 @@ namespace cedar {
 		for (short i = 0; i <= 256; ++i)
 			_reject[i] = i + 1;
 	}
-	void set_array (void* p, size_t size_ = 0) { // ad-hoc
+    void set_array (void* p, size_t size_ = 0) { // ad-hoc
       clear (false);
       if (size_)
         size_ = size_ * unit_size () - static_cast <size_t> (*static_cast <int*> (p));
